@@ -65,7 +65,7 @@ curl -s -X POST http://localhost:8787/mcp \
 
 ## Agent Test (OpenAI SDK + OpenRouter-compatible)
 
-1) Create `.env` at repo root:
+1) Create `.env` at repo root (see `.env.example`):
 
 ```ini
 OPENROUTER_API_KEY=your_key
@@ -79,6 +79,8 @@ MCP_URL=http://localhost:8787/mcp
 ```powershell
 python .\test.py
 ```
+
+For extensible MCP server config, see `mcp/mcp_config.example.json` (includes a remote MCP example).
 
 ## Cloudflare Worker
 

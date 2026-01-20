@@ -1,0 +1,24 @@
+{
+  "mcpServers": {
+    "nodeA": {
+      "url": "http://localhost:8001/mcp",
+      "description": "Math tools"
+    },
+    "nodeB": {
+      "url": "http://localhost:8002/mcp",
+      "description": "Search tools"
+    },
+    "nodeC": {
+      "url": "http://localhost:8003/mcp",
+      "description": "Social tools"
+    },
+    "nodeD": {
+      "url": "http://localhost:8004/mcp",
+      "description": "Weather tools"
+    },
+    "remote-mcp-example": {
+      "url": "https://api.example.com/mcp?token=YOUR_TOKEN",
+      "description": "Remote MCP example (replace token)"
+    }
+  }
+}

@@ -61,7 +61,7 @@ curl -s -X POST http://localhost:8787/mcp \
 
 ## 智能体测试（OpenAI SDK + OpenRouter 兼容）
 
-1）在仓库根目录创建 `.env`：
+1）在仓库根目录创建 `.env`（参考 `.env.example`）：
 
 ```ini
 OPENROUTER_API_KEY=your_key
@@ -75,6 +75,8 @@ MCP_URL=http://localhost:8787/mcp
 ```powershell
 python .\test.py
 ```
+
+可扩展的 MCP 服务器配置示例见 `mcp/mcp_config.example.json`（包含远端 MCP 示例）。
 
 ## Cloudflare Worker
 
