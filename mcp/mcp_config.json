@@ -1,0 +1,28 @@
+{
+    "mcpServers": {
+        "nodeA": {
+            "url": "http://localhost:8001/mcp",
+            "description": "Math tools"
+        },
+        "nodeB": {
+            "url": "http://localhost:8002/mcp",
+            "description": "Search tools"
+        },
+        "nodeC": {
+            "url": "http://localhost:8003/mcp",
+            "description": "Social tools"
+        },
+        "nodeD": {
+            "url": "http://localhost:8004/mcp",
+            "description": "Weather tools"
+        },
+        "local-arxiv-server": {
+            "command": "python",
+            "args": ["src/mcp/mcp_server.py"]
+        },
+        "local-photo-process-server": {
+            "command": "python",
+            "args": ["src/mcp/photo_process.py"]
+        }
+    }
+}

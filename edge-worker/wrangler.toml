@@ -1,0 +1,6 @@
+name = "edge-mcp-router"
+main = "src/worker.js"
+compatibility_date = "2024-10-01"
+
+[vars]
+MCP_NODES = '["http://localhost:8001/mcp","http://localhost:8002/mcp","http://localhost:8003/mcp","http://localhost:8004/mcp"]'
