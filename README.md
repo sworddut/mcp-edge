@@ -20,7 +20,7 @@ The diagram above illustrates the multi-round interaction pattern and progressiv
 - `test.py` Simple LLM agent (OpenAI SDK + MCP)
 - `start_all.ps1` Start NodeA–D + local Worker
 
-![Code Architecture](static\imgs\代码架构.png)
+![Code Architecture](static/imgs/代码架构.png)
 
 ## Prerequisites
 

@@ -16,7 +16,7 @@
 - `test.py` 简单智能体（OpenAI SDK + MCP）
 - `start_all.ps1` 一键启动 NodeA–D + 本地 Worker
 
-![代码架构](static\imgs\代码架构.png)
+![代码架构](static/imgs/代码架构.png)
 
 ## 依赖
 
