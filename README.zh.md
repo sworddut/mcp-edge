@@ -2,6 +2,12 @@
 
 一个最小可运行的 Edge MCP 网关 + 后端 MCP 节点示例。网关支持渐进式披露：先暴露节点列表，再按节点返回工具列表，并将工具调用转发到对应节点。
 
+## 架构概览
+
+![MCP Edge Router - 渐进式披露模式](static/imgs/交互.png)
+
+上图展示了 MCP Edge Router 的多轮交互模式和渐进式披露机制，说明了 LLM Agent 如何通过网关逐步发现节点、查询工具并执行操作。
+
 ## 项目结构
 
 - `edge-worker/` Cloudflare Worker MCP 网关（JSON-RPC / Streamable HTTP）
@@ -9,6 +15,8 @@
 - `mcp/edge_gateway.py` Python 网关（本地参考）
 - `test.py` 简单智能体（OpenAI SDK + MCP）
 - `start_all.ps1` 一键启动 NodeA–D + 本地 Worker
+
+![代码架构](static\imgs\代码架构.png)
 
 ## 依赖
 

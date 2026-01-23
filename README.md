@@ -6,6 +6,12 @@ Minimal demo of an Edge MCP router (Cloudflare Worker) with backend MCP nodes (F
 It supports progressive disclosure: the gateway only exposes node discovery and tool
 listing, then forwards tool calls to the selected node.
 
+## Architecture Overview
+
+![MCP Edge Router - Progressive Disclosure Pattern](static/imgs/交互.png)
+
+The diagram above illustrates the multi-round interaction pattern and progressive disclosure mechanism of the MCP Edge Router, showing how the LLM Agent discovers nodes, queries tools, and executes operations through the gateway.
+
 ## Project Layout
 
 - `edge-worker/` Cloudflare Worker MCP gateway (JSON-RPC over Streamable HTTP)
@@ -13,6 +19,8 @@ listing, then forwards tool calls to the selected node.
 - `mcp/edge_gateway.py` Python gateway (local reference)
 - `test.py` Simple LLM agent (OpenAI SDK + MCP)
 - `start_all.ps1` Start NodeA–D + local Worker
+
+![Code Architecture](static\imgs\代码架构.png)
 
 ## Prerequisites
 
