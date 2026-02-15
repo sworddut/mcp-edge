@@ -15,9 +15,16 @@ The diagram above illustrates the multi-round interaction pattern and progressiv
 ## Project Layout
 
 - `edge-worker/` Cloudflare Worker MCP gateway (JSON-RPC over Streamable HTTP)
+  - `src/worker.js` gateway entrypoint (JSON-RPC routing)
+  - `src/tool-handler.js` tool dispatch (`list_nodes` / `list_node_tools` / `call_node_tool`)
+  - `src/node-service.js` node discovery, caching, node calls
+  - `src/mcp-client.js` upstream JSON-RPC and timeout handling
+  - `src/redis.js` Upstash Redis wrapper
+  - `src/constants.js` / `src/helpers.js` shared constants and helpers
 - `nodes/` NodeA–D FastMCP servers (HTTP `/mcp`)
 - `mcp/edge_gateway.py` Python gateway (local reference)
 - `test.py` Simple LLM agent (OpenAI SDK + MCP)
+- `bench_cache.py` cache benchmark script
 - `start_all.ps1` Start NodeA–D + local Worker
 
 ![Code Architecture](static/imgs/代码架构.png)
@@ -29,7 +36,15 @@ The diagram above illustrates the multi-round interaction pattern and progressiv
 - Core Python deps in `requirements.txt`
 - Wrangler (via `npx` is fine)
 
-## Install Python Dependencies
+## Install Python Dependencies (recommended: single `uv` env)
+
+```bash
+uv venv .venv
+uv pip install -r requirements.txt --python .venv/bin/python
+source .venv/bin/activate
+```
+
+If you prefer conda, you can still use:
 
 ```bash
 conda create -n llm-agent-env python=3.11
@@ -37,9 +52,22 @@ conda activate llm-agent-env
 pip install -r requirements.txt
 ```
 
-## Local Run (Windows PowerShell)
+## Local Run
 
 ### 1) Start NodeA–D + Worker
+
+macOS / Linux (single shared env):
+
+```bash
+source .venv/bin/activate
+python nodes/node_a/main.py
+python nodes/node_b/main.py
+python nodes/node_c/main.py
+python nodes/node_d/main.py
+cd edge-worker && npx wrangler dev --local
+```
+
+Windows PowerShell (existing script):
 
 ```powershell
 powershell -ExecutionPolicy Bypass -File .\start_all.ps1
@@ -103,7 +131,36 @@ Configure MCP node URLs in `edge-worker/wrangler.toml`:
 ```toml
 [vars]
 MCP_NODES = '["http://localhost:8001/mcp","http://localhost:8002/mcp","http://localhost:8003/mcp","http://localhost:8004/mcp"]'
+NODE_DISCOVERY_CACHE_TTL = "10"
+NODE_TOOLS_CACHE_TTL = "30"
+UPSTREAM_TIMEOUT_MS = "5000"
 ```
+
+Optional: enable Upstash Redis cache (for `wrangler dev --local`):
+
+```bash
+cd edge-worker
+cp .dev.vars.example .dev.vars
+# fill real values:
+# UPSTASH_REDIS_REST_URL=...
+# UPSTASH_REDIS_REST_TOKEN=...
+```
+
+Notes:
+- Without Upstash vars, gateway falls back to no-Redis mode.
+- `edge-worker/.dev.vars` is ignored by git.
+- For cloud deployment, use `wrangler secret put ...`.
+
+## Cache Benchmark
+
+From repo root:
+
+```bash
+source .venv/bin/activate
+python bench_cache.py --mcp-url http://localhost:8787/mcp --rounds 20
+```
+
+The script prints cold vs warm latency stats (avg/p95/min/max) for `list_nodes` and `list_node_tools`, plus speedup.
 
 ## Notes
 

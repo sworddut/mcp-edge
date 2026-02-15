@@ -11,9 +11,16 @@
 ## 项目结构
 
 - `edge-worker/` Cloudflare Worker MCP 网关（JSON-RPC / Streamable HTTP）
+  - `src/worker.js` 网关入口（JSON-RPC 路由）
+  - `src/tool-handler.js` 工具分发（`list_nodes` / `list_node_tools` / `call_node_tool`）
+  - `src/node-service.js` 节点发现、缓存、节点调用
+  - `src/mcp-client.js` 上游 JSON-RPC 与超时控制
+  - `src/redis.js` Upstash Redis 读写封装
+  - `src/constants.js` / `src/helpers.js` 常量与通用函数
 - `nodes/` NodeA–D FastMCP 服务器（HTTP `/mcp`）
 - `mcp/edge_gateway.py` Python 网关（本地参考）
 - `test.py` 简单智能体（OpenAI SDK + MCP）
+- `bench_cache.py` 缓存前后耗时对比脚本
 - `start_all.ps1` 一键启动 NodeA–D + 本地 Worker
 
 ![代码架构](static/imgs/代码架构.png)
@@ -25,7 +32,15 @@
 - Python 依赖在 `requirements.txt`
 - Wrangler（可用 `npx` 运行）
 
-## 安装 Python 依赖
+## 安装 Python 依赖（推荐 `uv` 单环境）
+
+```bash
+uv venv .venv
+uv pip install -r requirements.txt --python .venv/bin/python
+source .venv/bin/activate
+```
+
+如果使用 conda，也可沿用：
 
 ```bash
 conda create -n llm-agent-env python=3.11
@@ -33,9 +48,22 @@ conda activate llm-agent-env
 pip install -r requirements.txt
 ```
 
-## 本地启动（Windows PowerShell）
+## 本地启动
 
 ### 1）启动 NodeA–D + Worker
+
+macOS / Linux（推荐，单环境）：
+
+```bash
+source .venv/bin/activate
+python nodes/node_a/main.py
+python nodes/node_b/main.py
+python nodes/node_c/main.py
+python nodes/node_d/main.py
+cd edge-worker && npx wrangler dev --local
+```
+
+Windows PowerShell（已有脚本）：
 
 ```powershell
 powershell -ExecutionPolicy Bypass -File .\start_all.ps1
@@ -99,7 +127,39 @@ npx wrangler dev --local
 ```toml
 [vars]
 MCP_NODES = '["http://localhost:8001/mcp","http://localhost:8002/mcp","http://localhost:8003/mcp","http://localhost:8004/mcp"]'
+NODE_DISCOVERY_CACHE_TTL = "10"
+NODE_TOOLS_CACHE_TTL = "30"
+UPSTREAM_TIMEOUT_MS = "5000"
 ```
+
+可选：启用 Upstash Redis 缓存（网关侧，`wrangler dev --local`）：
+
+```bash
+cd edge-worker
+cp .dev.vars.example .dev.vars
+# 填写真实值
+# UPSTASH_REDIS_REST_URL=...
+# UPSTASH_REDIS_REST_TOKEN=...
+```
+
+说明：
+- 未配置 Upstash 变量时，网关自动回退为无 Redis 缓存模式。
+- `edge-worker/.dev.vars` 已加入 `.gitignore`，不会进入版本库。
+- 云上部署时再使用 `wrangler secret put ...` 写入生产/预发环境。
+
+## 缓存效果基准测试
+
+在仓库根目录执行：
+
+```bash
+source .venv/bin/activate
+python bench_cache.py --mcp-url http://localhost:8787/mcp --rounds 20
+```
+
+脚本会输出：
+- `list_nodes` 冷启动 vs 热请求平均/P95
+- `list_node_tools` 冷启动 vs 热请求平均/P95
+- 冷热加速比（speedup）
 
 ## 说明
 
